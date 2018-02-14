@@ -1,8 +1,12 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
 const app = express();
+
+mongoose.connect('mongodb://localhost/Node-rest-api');
+mongoose.Promise = global.Promise;
 
 app.use(morgan('dev'));
 
