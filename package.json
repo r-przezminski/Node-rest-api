@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/r-przezminski/Node-rest-api#readme",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "morgan": "^1.9.0",
