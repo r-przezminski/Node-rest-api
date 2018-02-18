@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
 const User = require('../models/user');
 
 exports.userRegister = (req, res, next) => {
@@ -59,7 +58,7 @@ exports.userLogin = (req, res, next) => {
 						message: "Incorrect email or password"
 					});
 				}
-				const token = jwt.sign({ email: user.email, _id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
+				const token = jwt.sign({ email: user.email, _id: user._id }, process.env.JWT_KEY, { expiresIn: "1h" });
 				return res.status(200).json({
 					message: "Logged in",
 					token: token
@@ -72,4 +71,17 @@ exports.userLogin = (req, res, next) => {
 			})
 		})
 };
-exports.userAccount = (req, res, next) => {};
+exports.userAccount = (req, res, next) => {
+	User.findById(req.userData._id).exec()
+		.then(user => {
+			res.status(200).json({
+				user: user
+			})
+		})
+		.catch(err => {
+			res.status(500).json({
+				error: err
+			})
+		})
+};
+exports.userEdit = (req, res, next) => {}
