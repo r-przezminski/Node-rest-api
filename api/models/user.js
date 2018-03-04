@@ -1,25 +1,37 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const bcrypt = require('bcrypt');
+
+const { Schema } = mongoose;
 
 const userSchema = new Schema({
-	email: {
-		type: String,
-		required: [true, 'Email address is required.'],
-		validate: {
-			validator: v => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v),
-			message: '{VALUE} is not valid email address.',
-		}
-	},
-	password: {
-		type: String,
-		required: [true, 'Password field is required.']
-	},
-	firstName: String,
-	lastName: String,
-	address: [{city: String}, {street: String}, {zipCode: String}],
-	phoneNumber: Number,
-	avatar: String,
-	nick: String,
+  email: String,
+  password: String,
+  avatar: String,
+  nick: String,
+  posts: [{
+    type: Schema.Types.ObjectId,
+    ref: 'post',
+  }],
 });
+
+async function hashPassword(next) {
+  try {
+    const passwordHash = await bcrypt.hash(this.password, 10);
+    this.password = passwordHash;
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function comparePasswords(password) {
+  try {
+    return await bcrypt.compare(password, this.password);
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+userSchema.pre('save', hashPassword);
+userSchema.methods.verifyPassword = comparePasswords;
 
 module.exports = mongoose.model('User', userSchema);
