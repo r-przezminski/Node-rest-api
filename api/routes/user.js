@@ -8,9 +8,12 @@ const verifyToken = passport.authenticate('jwt', { session: false });
 const auth = passport.authenticate('local', { session: false });
 
 const userController = require('../controllers/users');
+const { validate } = require('../middleware/validator');
+const { signInSchema, signUpSchema } = require('../middleware/validator').userSchema;
 
-router.post('/register', userController.userRegister);
-router.post('/log-in', auth, userController.userLogin);
-router.get('/account', verifyToken, userController.userAccount);
+router.post('/signup', validate(signUpSchema), userController.signUp);
+router.post('/signin', validate(signInSchema), auth, userController.signIn);
+router.get('/account', verifyToken, userController.account);
+router.get('/posts', verifyToken, userController.userPosts);
 
 module.exports = router;
