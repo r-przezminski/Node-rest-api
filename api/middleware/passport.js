@@ -24,8 +24,11 @@ module.exports = passport => {
   }, async (email, password, done) => {
     try {
       const user = await User.findOne({ email });
+      if (!user) {
+        return done(null, false);
+      }
       const matchedPassword = await user.verifyPassword(password);
-      if (!user && !matchedPassword) {
+      if (!matchedPassword) {
         return done(null, false);
       }
       return done(null, user);
