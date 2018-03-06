@@ -7,8 +7,8 @@ const corsHeaders = require('./api/middleware/cors');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost/Node-rest-api');
 mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/Node-rest-api');
 
 app.use(morgan('dev'));
 
@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 
 app.use(corsHeaders);
 
-app.use('/api/user', require('./api/routes/user'));
+app.use('/api/users', require('./api/routes/user'));
 app.use('/api/posts', require('./api/routes/post'));
 
 app.use((req, res, next) => {
