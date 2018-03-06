@@ -2,15 +2,15 @@ const Post = require('../models/post');
 const User = require('../models/user');
 
 module.exports = {
-  getPosts: async (req, res) => {
-    const posts = await Post.find({});
+  index: async (req, res) => {
+    const posts = await Post.find({}).populate('user');
     return res.status(200).json(posts);
   },
-  addPost: async (req, res, next) => {
+
+  store: async (req, res, next) => {
     try {
-      const { _id: userId } = req.userData;
       const post = new Post(req.body);
-      const user = await User.findById(userId);
+      const user = await User.findById(req.user.id);
       post.user = user;
       await post.save();
       user.posts.push(post);

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const { Schema } = mongoose;
 
@@ -10,28 +10,30 @@ const userSchema = new Schema({
   nick: String,
   posts: [{
     type: Schema.Types.ObjectId,
-    ref: 'post',
+    ref: 'Post',
   }],
 });
 
-async function hashPassword(next) {
+async function hashPassword(next, isNewUser) {
   try {
-    const passwordHash = await bcrypt.hash(this.password, 10);
-    this.password = passwordHash;
+    if (typeof isNewUser === 'boolean' && isNewUser === true) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
     return next();
   } catch (error) {
     return next(error);
   }
 }
 
-async function comparePasswords(password) {
+async function verifyPassword(password) {
   try {
     return await bcrypt.compare(password, this.password);
   } catch (error) {
     throw new Error(error);
   }
 }
+
 userSchema.pre('save', hashPassword);
-userSchema.methods.verifyPassword = comparePasswords;
+userSchema.methods.verifyPassword = verifyPassword;
 
 module.exports = mongoose.model('User', userSchema);
